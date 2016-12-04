@@ -3,24 +3,21 @@ MAINTAINER Kilian Lackhove <kilian@lackhove.de>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get -y update
-RUN apt-get install -y wget
+RUN apt-get update && apt-get install -y xvfb x11vnc supervisor wget libflac8 libqt4-network libqtcore4 libqtgui4 libqtwebkit4 libvorbisfile3 xdg-utils
+
+RUN wget https://dl.google.com/linux/direct/google-musicmanager-beta_current_amd64.deb \
+    && dpkg -i google-musicmanager-beta_current_amd64.deb \
+    && rm google-musicmanager-beta_current_amd64.deb
 
 ADD install-macspoof.sh /install-macspoof.sh
 RUN /install-macspoof.sh
 
-RUN echo "deb http://dl.google.com/linux/musicmanager/deb/ stable main" >> /etc/apt/sources.list.d/google-musicmanager.list
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-
-RUN apt-get -y update
-RUN apt-get install -y google-musicmanager-beta xvfb x11vnc supervisor
-
 RUN mkdir /music
 VOLUME /music
 
-RUN mkdir -p /appdata /.config /root/.config
-RUN ln -s /appdata /.config/google-musicmanager
-RUN ln -s /appdata /root/.config/google-musicmanager
+RUN mkdir -p /appdata /.config /root/.config \
+    && ln -s /appdata /.config/google-musicmanager \
+    && ln -s /appdata /root/.config/google-musicmanager
 VOLUME /appdata
 
 EXPOSE 5900
